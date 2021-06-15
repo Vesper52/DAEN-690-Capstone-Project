@@ -1,4 +1,4 @@
-﻿Measured_Diabetes,Dr_Diabetes_Binary,SEQN,Gender,Age,Race,Birth_Country,Citizenship,Time_US,Edu_Kids,Edu_Adult,Marital_Status,Language,HH_Numb,AHH_Income,FAM_Income,FAM_Income_Poverty_Ratio,Dr_Diabetes,Pre_Dia,Doctor_Visits_12Months,Weight_kg,BMXRECUM,BMXHEAD,Height_cm,BMI,Len_Leg,Len_Arm,Waist,Fasting_Glucose,Health_Insurance,Private_Insurance
+﻿Measured_Diabetes,Dr_Diabetes_Binary,SEQN,Gender,Age,Race,Birth_Country,Citizenship,Time_US,Edu_Kids,Edu_Adult,Marital_Status,Language,HH_Numb,AHH_Income,FAM_Income,FAM_Income_Poverty_Ratio,Dr_Diabetes,Pre_Dia,Doctor_Visits_12Months,Weight_kg,Len_Recum,Cir_Head,Height_cm,BMI,Len_Leg,Len_Arm,Waist,Fasting_Glucose,Health_Insurance,Private_Insurance
 0,1,83732,1,62,3,1,1,0,0,5,1,1,2,10,10,4.39,1,0,2,94.8,0,0,184.5,27.8,43.3,43.6,101.1,,1,14
 1,0,83733,1,53,3,2,2,7,0,3,3,1,1,4,4,1.32,2,2,0,90.4,0,0,171.4,30.8,38,40,107.9,101,2,0
 0,1,83734,1,78,3,1,1,0,0,3,1,1,2,5,5,1.51,1,0,0,83.4,0,0,170.1,28.8,35.6,37,116.5,84,1,14
