@@ -95,10 +95,11 @@ responseTesting_all <- factor(responseTesting_all)
 levels(responseTraining_all) <- c('No_Risk', 'Risk')
 levels(responseTesting_all) <- c('No_Risk', 'Risk')
 
-#params
+#Random Forest Model Parameters
 RFGrid <- expand.grid(.mtry = 3:6)
 RFparams <- trainControl(method = 'cv', number = 10, classProbs = TRUE, savePredictions = TRUE) 
 
+#Train Random Forest Model
 set.seed(0)
 RFmodel <- train(predictorTraining_all,responseTraining_all,method="rf",
                  trControl = RFparams,
@@ -106,13 +107,13 @@ RFmodel <- train(predictorTraining_all,responseTraining_all,method="rf",
 
 RFmodel
 RFmodel$bestTune
-RFmodel$results[3,] #these are the optimal model params
+RFmodel$results[3,] #these are the optimal model parameters
 RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
 
 RFTest <- data.frame(Method="RF",Y=responseTesting_all,
                      X=predict(RFmodel,predictorTesting_all))
 
-#RF Predict
+#Random Forest Predictions
 RFPredictions <- predict(RFmodel, newdata=predictorTesting_all)
 RFAssess <- data.frame(obs=responseTesting_all, pred = RFPredictions)
 defaultSummary(RFAssess)
@@ -125,6 +126,3 @@ test['predictions'] <- RFPredictions
 test['actual_vals'] <- responseTesting_all
 
 test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
-
-table(test$Race, test$Results)
-
