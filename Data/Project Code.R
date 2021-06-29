@@ -49,6 +49,18 @@ only_AA <- only_AA[,-1]
 #### end ####
 
 
+# 70%
+set.seed(0)
+index_non_AA <- createDataPartition(response_non_AA, p=0.7, list=FALSE)
+predictorTraining_non_AA <- non_AA[index_non_AA,]
+predictorTesting_non_AA <- non_AA[-index_non_AA,]
+responseTraining_non_AA <- response_non_AA[index_non_AA]
+responseTesting_non_AA <- response_non_AA[-index_non_AA]
+
+#params
+RFGrid <- expand.grid(.mtry = 3:6)
+RFparams <- trainControl(method = 'cv', number = 10, classProbs = TRUE, savePredictions = TRUE) 
+
 #### 5%  African American ####
 
 # 5%  African American
@@ -332,21 +344,6 @@ test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
 
 table(test$Race, test$Results)
 #### end ####
-
-# 70%
-set.seed(0)
-index_non_AA <- createDataPartition(response_non_AA, p=0.7, list=FALSE)
-predictorTraining_non_AA <- non_AA[index_non_AA,]
-predictorTesting_non_AA <- non_AA[-index_non_AA,]
-responseTraining_non_AA <- response_non_AA[index_non_AA]
-responseTesting_non_AA <- response_non_AA[-index_non_AA]
-
-
-
-#params
-RFGrid <- expand.grid(.mtry = 3:6)
-RFparams <- trainControl(method = 'cv', number = 10, classProbs = TRUE, savePredictions = TRUE) 
-
 
 
 
