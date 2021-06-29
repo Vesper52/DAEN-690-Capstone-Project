@@ -11,7 +11,7 @@ data_nhanes <- read.csv('NHANES_Data.csv', header = T, sep = ',')
 
 #Select needed columns and rename
 colnames(data_nhanes)
-nhanes_trim <- subset(data_nhanes, select=-c(ï..Measured_Diabetes_A1c, Measured_Diabetes, Dr_Diabetes_Binary, Dr_Diabetes, Pre_Dia, SEQN, AHH_Income,
+nhanes_trim <- subset(data_nhanes, select=-c(Ã¯..Measured_Diabetes_A1c, Measured_Diabetes, Dr_Diabetes_Binary, Dr_Diabetes, Pre_Dia, SEQN, AHH_Income,
                                FAM_Income, Weight_kg, Height_cm, Len_Leg, Len_Arm, Waist, Fasting_Glucose, Private_Insurance))
 colnames(nhanes_trim)
 
@@ -126,3 +126,41 @@ test['predictions'] <- RFPredictions
 test['actual_vals'] <- responseTesting_all
 
 test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+####model without subsampling AAs#####
+response_all <- rm_nas[,'Measured_Diabetes_x2']
+pred_all <- rm_nas[,-1]
+
+set.seed(0)
+index_all <- createDataPartition(response_all, p=0.7, list=FALSE)
+pred_train_all <- pred_all[index_all,]
+pred_test_all <- pred_all[-index_all,]
+resp_train_all <- response_all[index_all]
+resp_test_all <- response_all[-index_all]
+
+resp_train_all <- factor(resp_train_all)
+resp_test_all <- factor(resp_test_all)
+levels(resp_train_all) <- c('No_Risk', 'Risk')
+levels(resp_test_all) <- c('No_Risk', 'Risk')
+
+set.seed(0)
+RFmodel_all <- train(pred_train_all,resp_train_all,method="rf",
+                 trControl = RFparams,
+                 tuneGrid = RFGrid)
+RFmodel_all
+RFmodel_all$bestTune
+RFmodel_all$results[2,] #these are the optimal model params
+RFmerge_all <- merge(RFmodel_all$pred,  RFmodel_all$bestTune)
+
+RFPredictions_all <- predict(RFmodel_all, newdata=pred_test_all)
+RFAssess_all <- data.frame(obs=resp_test_all, pred = RFPredictions_all)
+defaultSummary(RFAssess_all)
+confusionMatrix(RFPredictions_all, reference = resp_test_all)
+
+test_all <- pred_test_all
+test_all['predictions'] <- RFPredictions_all
+test_all['actual_vals'] <- resp_test_all
+test_all <- test_all %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+table(test_all$Race, test_all$Results)
