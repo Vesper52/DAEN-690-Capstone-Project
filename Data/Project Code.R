@@ -3,7 +3,7 @@ library(ggplot2)
 library(randomForest)
 library(dplyr)
 
-#setwd('C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data')
+setwd('C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data')
 
 #### Data Load and Subset ####
 setwd('C:/Users/jeres/Documents/GitHub/DAEN-690-Capstone-Project/Data')
@@ -110,7 +110,7 @@ RFmodel <- train(predictorTraining_all5,responseTraining_all5,method="rf",
 
 RFmodel
 RFmodel$bestTune
-RFmodel$results[3,] #these are the optimal model params
+RFmodel$results[4,] #these are the optimal model params
 RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
 
 RFTest <- data.frame(Method="RF",Y=responseTesting_all5,
@@ -120,7 +120,7 @@ RFTest <- data.frame(Method="RF",Y=responseTesting_all5,
 RFPredictions <- predict(RFmodel, newdata=predictorTesting_all5)
 RFAssess <- data.frame(obs=responseTesting_all5, pred = RFPredictions)
 defaultSummary(RFAssess)
-confusionMatrix(RFPredictions, reference = responseTesting_all5)
+confusionMatrix(RFPredictions, reference = responseTesting_all5, positive='Risk')
 
 varImp(RFmodel)
 
@@ -182,7 +182,7 @@ RFmodel <- train(predictorTraining_all10,responseTraining_all10,method="rf",
 
 RFmodel
 RFmodel$bestTune
-RFmodel$results[3,] #these are the optimal model params
+RFmodel$results[2,] #these are the optimal model params
 RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
 
 RFTest <- data.frame(Method="RF",Y=responseTesting_all10,
@@ -192,7 +192,7 @@ RFTest <- data.frame(Method="RF",Y=responseTesting_all10,
 RFPredictions <- predict(RFmodel, newdata=predictorTesting_all10)
 RFAssess <- data.frame(obs=responseTesting_all10, pred = RFPredictions)
 defaultSummary(RFAssess)
-confusionMatrix(RFPredictions, reference = responseTesting_all10)
+confusionMatrix(RFPredictions, reference = responseTesting_all10, positive='Risk')
 
 varImp(RFmodel)
 
@@ -262,7 +262,7 @@ RFTest <- data.frame(Method="RF",Y=responseTesting_all15,
 RFPredictions <- predict(RFmodel, newdata=predictorTesting_all15)
 RFAssess <- data.frame(obs=responseTesting_all15, pred = RFPredictions)
 defaultSummary(RFAssess)
-confusionMatrix(RFPredictions, reference = responseTesting_all15)
+confusionMatrix(RFPredictions, reference = responseTesting_all15, positive='Risk')
 
 varImp(RFmodel)
 
@@ -322,7 +322,7 @@ RFmodel <- train(predictorTraining_all20,responseTraining_all20,method="rf",
 
 RFmodel
 RFmodel$bestTune
-RFmodel$results[3,] #these are the optimal model params
+RFmodel$results[1,] #these are the optimal model params
 RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
 
 RFTest <- data.frame(Method="RF",Y=responseTesting_all20,
@@ -332,7 +332,7 @@ RFTest <- data.frame(Method="RF",Y=responseTesting_all20,
 RFPredictions <- predict(RFmodel, newdata=predictorTesting_all20)
 RFAssess <- data.frame(obs=responseTesting_all20, pred = RFPredictions)
 defaultSummary(RFAssess)
-confusionMatrix(RFPredictions, reference = responseTesting_all20)
+confusionMatrix(RFPredictions, reference = responseTesting_all20, positive='Risk')
 
 varImp(RFmodel)
 
@@ -376,7 +376,7 @@ RFmerge_all <- merge(RFmodel_all$pred,  RFmodel_all$bestTune)
 RFPredictions_all <- predict(RFmodel_all, newdata=pred_test_all)
 RFAssess_all <- data.frame(obs=resp_test_all, pred = RFPredictions_all)
 defaultSummary(RFAssess_all)
-confusionMatrix(RFPredictions_all, reference = resp_test_all)
+confusionMatrix(RFPredictions_all, reference = resp_test_all, positive='Risk')
 
 test_all <- pred_test_all
 test_all['predictions'] <- RFPredictions_all
