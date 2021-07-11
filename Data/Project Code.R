@@ -2,6 +2,7 @@ library(caret)
 library(ggplot2)
 library(randomForest)
 library(dplyr)
+library(fastDummies)
 
 setwd('C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data')
 
@@ -384,3 +385,203 @@ test_all['actual_vals'] <- resp_test_all
 test_all <- test_all %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
 table(test_all$Race, test_all$Results)
 #### end ####
+
+##############################################################################################################################
+### GLMnet Modeling ###
+
+##create dummy cols for 5% AA
+dummyPredictorsTrain5 <- dummy_cols(predictorTraining_all5, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                      'HH_Numb','Health_Insurance'))
+
+dummyPredictorsTrain5 <- dummyPredictorsTrain5[,-c(1,4,5,6,7,8,12)]
+
+dummyPredictorsTest5 <- dummy_cols(predictorTesting_all5, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                           'HH_Numb','Health_Insurance'))
+dummyPredictorsTest5 <- dummyPredictorsTest5[,-c(1,4,5,6,7,8,12)]
+
+# 5% AA
+set.seed(0)
+glmnetModel <- train(dummyPredictorsTrain5[,-2],responseTraining_all5,method="glmnet",
+                 trControl = RFparams, preProcess = c('center', 'scale'))
+
+glmnetModel
+glmnetModel$bestTune
+glmnetModel$results[7,] #these are the optimal model params
+glmnetMerge <- merge(glmnetModel$pred,  glmnetModel$bestTune)
+
+#glmnetTest <- data.frame(Method="RF",Y=responseTesting_all5,
+                    # X=predict(RFmodel,predictorTesting_all5))
+
+#5% GLMnet Predict
+glmnetPredictions <- predict(glmnetModel, newdata=dummyPredictorsTest5[,-2])
+glmnetAssess <- data.frame(obs=responseTesting_all5, pred = glmnetPredictions)
+defaultSummary(glmnetAssess)
+confusionMatrix(glmnetPredictions, reference = responseTesting_all5, positive='Risk')
+
+test <- dummyPredictorsTest5
+test['Race'] <- dummyPredictorsTest5[,2]
+test['predictions'] <- glmnetPredictions
+test['actual_vals'] <- responseTesting_all5
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+## END ##
+
+#20% GLMnet predictions
+dummyPredictorsTrain20 <- dummy_cols(predictorTraining_all20, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                             'HH_Numb','Health_Insurance'))
+
+dummyPredictorsTrain20 <- dummyPredictorsTrain20[,-c(1,4,5,6,7,8,12)]
+
+dummyPredictorsTest20 <- dummy_cols(predictorTesting_all20, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                           'HH_Numb','Health_Insurance'))
+dummyPredictorsTest20 <- dummyPredictorsTest20[,-c(1,4,5,6,7,8,12)]
+
+# 20% AA
+set.seed(0)
+glmnetModel <- train(dummyPredictorsTrain20[,-2],responseTraining_all20,method="glmnet",
+                     trControl = RFparams, preProcess = c('center', 'scale'))
+
+glmnetModel
+glmnetModel$bestTune
+glmnetModel$results[7,] #these are the optimal model params
+glmnetMerge <- merge(glmnetModel$pred,  glmnetModel$bestTune)
+
+#glmnetTest <- data.frame(Method="RF",Y=responseTesting_all5,
+# X=predict(RFmodel,predictorTesting_all5))
+
+#20% GLMnet Predict
+glmnetPredictions <- predict(glmnetModel, newdata=dummyPredictorsTest20[,-2])
+glmnetAssess <- data.frame(obs=responseTesting_all20, pred = glmnetPredictions)
+defaultSummary(glmnetAssess)
+confusionMatrix(glmnetPredictions, reference = responseTesting_all20, positive='Risk')
+
+test <- dummyPredictorsTest20
+test['Race'] <- dummyPredictorsTest20[,2]
+test['predictions'] <- glmnetPredictions
+test['actual_vals'] <- responseTesting_all20
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+## END ##
+
+#GLMNET No Subsample
+dummyPredictorsTrainall <- dummy_cols(pred_train_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                               'HH_Numb','Health_Insurance'))
+
+dummyPredictorsTrainall <- dummyPredictorsTrainall[,-c(1,4,5,6,7,8,12)]
+
+dummyPredictorsTestall <- dummy_cols(pred_test_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                             'HH_Numb','Health_Insurance'))
+dummyPredictorsTestall <- dummyPredictorsTestall[,-c(1,4,5,6,7,8,12)]
+
+# No Subsample
+set.seed(0)
+glmnetModel <- train(dummyPredictorsTrainall[,-2],resp_train_all,method="glmnet",
+                     trControl = RFparams, preProcess = c('center', 'scale'))
+
+glmnetModel
+glmnetModel$bestTune
+glmnetModel$results[7,] #these are the optimal model params
+glmnetMerge <- merge(glmnetModel$pred,  glmnetModel$bestTune)
+
+#glmnetTest <- data.frame(Method="RF",Y=responseTesting_all5,
+# X=predict(RFmodel,predictorTesting_all5))
+
+#No Subsample GLMnet predict
+glmnetPredictions <- predict(glmnetModel, newdata=dummyPredictorsTestall[,-2])
+glmnetAssess <- data.frame(obs=resp_test_all, pred = glmnetPredictions)
+defaultSummary(glmnetAssess)
+confusionMatrix(glmnetPredictions, reference = resp_test_all, positive='Risk')
+
+test <- dummyPredictorsTestall
+test['Race'] <- dummyPredictorsTestall[,2]
+test['predictions'] <- glmnetPredictions
+test['actual_vals'] <- resp_test_all
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+###############################################################################################################################
+### SVM Radial Kernel ###
+
+## 5% SVM Model
+set.seed(0)
+svmModel <- train(dummyPredictorsTrain5[,-2],responseTraining_all5,method="svmRadial",
+                     trControl = RFparams, preProcess = c('center', 'scale'), tuneLength=10)
+svmModel
+svmModel$bestTune
+svmModel$results[8,] #these are the optimal model params
+svmMerge <- merge(svmModel$pred,  svmModel$bestTune)
+
+#5% SVM Predict
+svmPredictions <- predict(svmModel, newdata=dummyPredictorsTest5[,-2])
+svmAssess <- data.frame(obs=responseTesting_all5, pred = svmPredictions)
+defaultSummary(svmAssess)
+confusionMatrix(svmPredictions, reference = responseTesting_all5, positive='Risk')
+
+test <- dummyPredictorsTest5
+test['Race'] <- dummyPredictorsTest5[,2]
+test['predictions'] <- svmPredictions
+test['actual_vals'] <- responseTesting_all5
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+## 20% SVM Model
+set.seed(0)
+svmModel <- train(dummyPredictorsTrain20[,-2],responseTraining_all20,method="svmRadial",
+                     trControl = RFparams, preProcess = c('center', 'scale'), tuneLength = 10)
+
+svmModel
+svmModel$bestTune
+svmModel$results[7,] #these are the optimal model params
+svmMerge <- merge(svmModel$pred,  svmModel$bestTune)
+
+#20% GLMnet Predict
+svmPredictions <- predict(svmModel, newdata=dummyPredictorsTest20[,-2])
+svmAssess <- data.frame(obs=responseTesting_all20, pred = svmPredictions)
+defaultSummary(svmAssess)
+confusionMatrix(svmPredictions, reference = responseTesting_all20, positive='Risk')
+
+test <- dummyPredictorsTest20
+test['Race'] <- dummyPredictorsTest20[,2]
+test['predictions'] <- svmPredictions
+test['actual_vals'] <- responseTesting_all20
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+## No Subsample SVM Model
+set.seed(0)
+svmModel <- train(dummyPredictorsTrainall[,-2],resp_train_all,method="svmRadial",
+                     trControl = RFparams, preProcess = c('center', 'scale'), tuneLength = 10)
+
+svmModel
+svmModel$bestTune
+svmModel$results[4,] #these are the optimal model params
+svmMerge <- merge(svmModel$pred,  svmModel$bestTune)
+
+
+#No Subsample SVM predict
+svmPredictions <- predict(svmModel, newdata=dummyPredictorsTestall[,-2])
+svmAssess <- data.frame(obs=resp_test_all, pred = svmPredictions)
+defaultSummary(svmAssess)
+confusionMatrix(svmPredictions, reference = resp_test_all, positive='Risk')
+
+test <- dummyPredictorsTestall
+test['Race'] <- dummyPredictorsTestall[,2]
+test['predictions'] <- svmPredictions
+test['actual_vals'] <- resp_test_all
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
