@@ -11,7 +11,7 @@ setwd('C:/Users/jeres/Documents/GitHub/DAEN-690-Capstone-Project/Data')
 data_nhanes <- read.csv('NHANES_Data.csv', header = T, sep = ',')
 colnames(data_nhanes)
 
-nhanes_trim <- subset(data_nhanes, select=-c(ï..Measured_Diabetes_A1c, Measured_Diabetes, Dr_Diabetes_Binary, Dr_Diabetes, Pre_Dia, SEQN, AHH_Income,
+nhanes_trim <- subset(data_nhanes, select=-c(ï..Measured_Diabetes_A1c, Measured_Diabetes, Dr_Diabetes_Binary, Dr_Diabetes, Pre_Dia, AHH_Income,
                                               FAM_Income, Weight_kg, Height_cm, Len_Leg, Len_Arm, Waist, Fasting_Glucose, Private_Insurance))
 colnames(nhanes_trim)
 
@@ -30,6 +30,10 @@ levels(nhanes_trim$Marital_Status) <- c('Married','Widowed','Divorced','Separate
 levels(nhanes_trim$Health_Insurance) <- c('Yes','No')
 
 rm_nas <- na.omit(nhanes_trim)
+
+write.csv(rm_nas, 'C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data/R_Final_DF.csv', row.names=F)
+
+nhanes_trim <- subset(nhanes_trim, select=-SEQN)
 
 non_AA <- subset(nhanes_trim, Race!='Black')
 table(non_AA$Race)
@@ -488,9 +492,6 @@ glmnetModel
 glmnetModel$bestTune
 glmnetModel$results[7,] #these are the optimal model params
 glmnetMerge <- merge(glmnetModel$pred,  glmnetModel$bestTune)
-
-#glmnetTest <- data.frame(Method="RF",Y=responseTesting_all5,
-# X=predict(RFmodel,predictorTesting_all5))
 
 #No Subsample GLMnet predict
 glmnetPredictions <- predict(glmnetModel, newdata=dummyPredictorsTestall[,-2])
