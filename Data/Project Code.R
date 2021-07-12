@@ -6,10 +6,12 @@ library(fastDummies)
 
 
 setwd("~/GitHub/DAEN-690-Capstone-Project/Data")
+setwd("C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data")
 
 #### Data Load and Subset ####
 #setwd('C:/Users/jeres/Documents/GitHub/DAEN-690-Capstone-Project/Data')
 data_nhanes <- read.csv('NHANES_Data.csv', header = T, sep = ',')
+
 colnames(data_nhanes)
 
 nhanes_trim <- subset(data_nhanes, select=-c(ï..Measured_Diabetes_A1c, Measured_Diabetes, Dr_Diabetes_Binary, Dr_Diabetes, Pre_Dia, AHH_Income,
@@ -325,11 +327,11 @@ table(test_all$Race, test_all$Results)
 dummyPredictorsTrain5 <- dummy_cols(predictorTraining_all5, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                       'HH_Numb','Health_Insurance'))
 
-dummyPredictorsTrain5 <- dummyPredictorsTrain5[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTrain5 <- dummyPredictorsTrain5[,-c(1,4,5,6,7,8,11)]
 
 dummyPredictorsTest5 <- dummy_cols(predictorTesting_all5, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                            'HH_Numb','Health_Insurance'))
-dummyPredictorsTest5 <- dummyPredictorsTest5[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTest5 <- dummyPredictorsTest5[,-c(1,4,5,6,7,8,11)]
 
 # 5% AA
 set.seed(0)
@@ -365,11 +367,11 @@ table(test$Race, test$Results)
 dummyPredictorsTrain20 <- dummy_cols(predictorTraining_all20, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                              'HH_Numb','Health_Insurance'))
 
-dummyPredictorsTrain20 <- dummyPredictorsTrain20[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTrain20 <- dummyPredictorsTrain20[,-c(1,4,5,6,7,8,11)]
 
 dummyPredictorsTest20 <- dummy_cols(predictorTesting_all20, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                            'HH_Numb','Health_Insurance'))
-dummyPredictorsTest20 <- dummyPredictorsTest20[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTest20 <- dummyPredictorsTest20[,-c(1,4,5,6,7,8,11)]
 
 # 20% AA
 set.seed(0)
@@ -406,11 +408,11 @@ table(test$Race, test$Results)
 dummyPredictorsTrain50 <- dummy_cols(predictorTraining_all50, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                                'HH_Numb','Health_Insurance'))
 
-dummyPredictorsTrain50 <- dummyPredictorsTrain50[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTrain50 <- dummyPredictorsTrain50[,-c(1,4,5,6,7,8,11)]
 
 dummyPredictorsTest50 <- dummy_cols(predictorTesting_all50, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                              'HH_Numb','Health_Insurance'))
-dummyPredictorsTest50 <- dummyPredictorsTest50[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTest50 <- dummyPredictorsTest50[,-c(1,4,5,6,7,8,11)]
 
 # 50% AA
 set.seed(0)
@@ -446,11 +448,11 @@ table(test$Race, test$Results)
 dummyPredictorsTrainall <- dummy_cols(pred_train_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                                'HH_Numb','Health_Insurance'))
 
-dummyPredictorsTrainall <- dummyPredictorsTrainall[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTrainall <- dummyPredictorsTrainall[,-c(1,2,5,6,7,8,9,12)]
 
 dummyPredictorsTestall <- dummy_cols(pred_test_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                              'HH_Numb','Health_Insurance'))
-dummyPredictorsTestall <- dummyPredictorsTestall[,-c(1,4,5,6,7,8,12)]
+dummyPredictorsTestall <- dummyPredictorsTestall[,-c(1,2,5,6,7,8,9,12)]
 
 # No Subsample
 set.seed(0)
