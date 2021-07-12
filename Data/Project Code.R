@@ -4,10 +4,11 @@ library(randomForest)
 library(dplyr)
 library(fastDummies)
 
-setwd('C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data')
+
+setwd("~/GitHub/DAEN-690-Capstone-Project/Data")
 
 #### Data Load and Subset ####
-setwd('C:/Users/jeres/Documents/GitHub/DAEN-690-Capstone-Project/Data')
+#setwd('C:/Users/jeres/Documents/GitHub/DAEN-690-Capstone-Project/Data')
 data_nhanes <- read.csv('NHANES_Data.csv', header = T, sep = ',')
 colnames(data_nhanes)
 
@@ -139,148 +140,6 @@ table(test$Race, test$Results)
 
 #### end ####
 
-
-#### 10%  African American ####
-
-# 10%  African American
-set.seed(0)
-index_AA10 <- createDataPartition(response_only_AA, p=0.1, list=FALSE)
-predictorTraining_only_AA10 <- only_AA[index_AA10,]
-predictorTesting_only_AA10 <- only_AA[-index_AA10,]
-responseTraining_only_AA10 <- response_only_AA[index_AA10]
-responseTesting_only_AA10 <- response_only_AA[-index_AA10]
-
-# 10% Predictor Training
-predictorTraining_all10 <- rbind(predictorTraining_only_AA10, predictorTraining_non_AA)
-nrow(predictorTraining_only_AA10)
-nrow(predictorTraining_non_AA)
-nrow(predictorTraining_all10)
-
-# 10% Predictor Testing
-predictorTesting_all10 <- rbind(predictorTesting_only_AA10, predictorTesting_non_AA)
-nrow(predictorTesting_only_AA10)
-nrow(predictorTesting_non_AA)
-nrow(predictorTesting_all10)
-
-# 10% Response Training
-responseTraining_all10 <- c(responseTraining_only_AA10, responseTraining_non_AA)
-length(responseTraining_only_AA10)
-length(responseTraining_non_AA)
-length(responseTraining_all10)
-
-# 10% Response Testing
-responseTesting_all10 <- c(responseTesting_only_AA10, responseTesting_non_AA)
-length(responseTesting_only_AA10)
-length(responseTesting_non_AA)
-length(responseTesting_all10)
-
-responseTraining_all10 <- factor(responseTraining_all10)
-responseTesting_all10 <- factor(responseTesting_all10)
-levels(responseTraining_all10) <- c('No_Risk', 'Risk')
-levels(responseTesting_all10) <- c('No_Risk', 'Risk')
-
-# 10% Training Random Forest
-set.seed(0)
-RFmodel <- train(predictorTraining_all10,responseTraining_all10,method="rf",
-                 trControl = RFparams,
-                 tuneGrid = RFGrid)
-
-RFmodel
-RFmodel$bestTune
-RFmodel$results[2,] #these are the optimal model params
-RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
-
-RFTest <- data.frame(Method="RF",Y=responseTesting_all10,
-                     X=predict(RFmodel,predictorTesting_all10))
-
-# 10% Random Forest Predict
-RFPredictions <- predict(RFmodel, newdata=predictorTesting_all10)
-RFAssess <- data.frame(obs=responseTesting_all10, pred = RFPredictions)
-defaultSummary(RFAssess)
-confusionMatrix(RFPredictions, reference = responseTesting_all10, positive='Risk')
-
-varImp(RFmodel)
-
-test <- predictorTesting_all10
-test['predictions'] <- RFPredictions
-test['actual_vals'] <- responseTesting_all10
-
-test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
-
-table(test$Race, test$Results)
-#### end ####
-
-
-#### 15%  African American ####
-# 15%  African American
-set.seed(0)
-index_AA15 <- createDataPartition(response_only_AA, p=0.15, list=FALSE)
-predictorTraining_only_AA15 <- only_AA[index_AA15,]
-predictorTesting_only_AA15 <- only_AA[-index_AA15,]
-responseTraining_only_AA15 <- response_only_AA[index_AA15]
-responseTesting_only_AA15 <- response_only_AA[-index_AA15]
-
-# 15% Predictor Training
-predictorTraining_all15 <- rbind(predictorTraining_only_AA15, predictorTraining_non_AA)
-nrow(predictorTraining_only_AA15)
-nrow(predictorTraining_non_AA)
-nrow(predictorTraining_all15)
-
-# 15% Predictor Testing
-predictorTesting_all15 <- rbind(predictorTesting_only_AA15, predictorTesting_non_AA)
-nrow(predictorTesting_only_AA15)
-nrow(predictorTesting_non_AA)
-nrow(predictorTesting_all15)
-
-# 15% Response Training
-responseTraining_all15 <- c(responseTraining_only_AA15, responseTraining_non_AA)
-length(responseTraining_only_AA15)
-length(responseTraining_non_AA)
-length(responseTraining_all15)
-
-# 15% Response Testing
-responseTesting_all15 <- c(responseTesting_only_AA15, responseTesting_non_AA)
-length(responseTesting_only_AA15)
-length(responseTesting_non_AA)
-length(responseTesting_all15)
-
-responseTraining_all15 <- factor(responseTraining_all15)
-responseTesting_all15 <- factor(responseTesting_all15)
-levels(responseTraining_all15) <- c('No_Risk', 'Risk')
-levels(responseTesting_all15) <- c('No_Risk', 'Risk')
-
-# 15% Training Random Forest 
-set.seed(0)
-RFmodel <- train(predictorTraining_all15,responseTraining_all15,method="rf",
-                 trControl = RFparams,
-                 tuneGrid = RFGrid)
-
-RFmodel
-RFmodel$bestTune
-RFmodel$results[3,] #these are the optimal model params
-RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
-
-RFTest <- data.frame(Method="RF",Y=responseTesting_all15,
-                     X=predict(RFmodel,predictorTesting_all15))
-
-# 15% Random Forest Predict
-RFPredictions <- predict(RFmodel, newdata=predictorTesting_all15)
-RFAssess <- data.frame(obs=responseTesting_all15, pred = RFPredictions)
-defaultSummary(RFAssess)
-confusionMatrix(RFPredictions, reference = responseTesting_all15, positive='Risk')
-
-varImp(RFmodel)
-
-test <- predictorTesting_all15
-test['predictions'] <- RFPredictions
-test['actual_vals'] <- responseTesting_all15
-
-test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
-
-table(test$Race, test$Results)
-#### end ####
-
-
 #### 20%  African American ####
 # 20%  African American
 set.seed(0)
@@ -351,6 +210,75 @@ table(test$Race, test$Results)
 #### end ####
 
 
+#### 50%  African American ####
+
+# 50%  African American
+set.seed(0)
+index_AA50 <- createDataPartition(response_only_AA, p=0.1, list=FALSE)
+predictorTraining_only_AA50 <- only_AA[index_AA50,]
+predictorTesting_only_AA50 <- only_AA[-index_AA50,]
+responseTraining_only_AA50 <- response_only_AA[index_AA50]
+responseTesting_only_AA50 <- response_only_AA[-index_AA50]
+
+# 50% Predictor Training
+predictorTraining_all50 <- rbind(predictorTraining_only_AA50, predictorTraining_non_AA)
+nrow(predictorTraining_only_AA50)
+nrow(predictorTraining_non_AA)
+nrow(predictorTraining_all50)
+
+# 50% Predictor Testing
+predictorTesting_all50 <- rbind(predictorTesting_only_AA50, predictorTesting_non_AA)
+nrow(predictorTesting_only_AA50)
+nrow(predictorTesting_non_AA)
+nrow(predictorTesting_all50)
+
+# 50% Response Training
+responseTraining_all50 <- c(responseTraining_only_AA50, responseTraining_non_AA)
+length(responseTraining_only_AA50)
+length(responseTraining_non_AA)
+length(responseTraining_all50)
+
+# 50% Response Testing
+responseTesting_all50 <- c(responseTesting_only_AA50, responseTesting_non_AA)
+length(responseTesting_only_AA50)
+length(responseTesting_non_AA)
+length(responseTesting_all50)
+
+responseTraining_all50 <- factor(responseTraining_all50)
+responseTesting_all50 <- factor(responseTesting_all50)
+levels(responseTraining_all50) <- c('No_Risk', 'Risk')
+levels(responseTesting_all50) <- c('No_Risk', 'Risk')
+
+# 50% Training Random Forest
+set.seed(0)
+RFmodel <- train(predictorTraining_all50,responseTraining_all50,method="rf",
+                 trControl = RFparams,
+                 tuneGrid = RFGrid)
+
+RFmodel
+RFmodel$bestTune
+RFmodel$results[2,] #these are the optimal model params
+RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
+
+RFTest <- data.frame(Method="RF",Y=responseTesting_all50,
+                     X=predict(RFmodel,predictorTesting_all50))
+
+# 50% Random Forest Predict
+RFPredictions <- predict(RFmodel, newdata=predictorTesting_all50)
+RFAssess <- data.frame(obs=responseTesting_all50, pred = RFPredictions)
+defaultSummary(RFAssess)
+confusionMatrix(RFPredictions, reference = responseTesting_all50, positive='Risk')
+
+varImp(RFmodel)
+
+test <- predictorTesting_all50
+test['predictions'] <- RFPredictions
+test['actual_vals'] <- responseTesting_all50
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+#### end ####
 
 
 ####model without subsampling AAs#####
@@ -473,6 +401,47 @@ table(test$Race, test$Results)
 
 ## END ##
 
+
+#50% GLMnet predictions
+dummyPredictorsTrain50 <- dummy_cols(predictorTraining_all50, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                               'HH_Numb','Health_Insurance'))
+
+dummyPredictorsTrain50 <- dummyPredictorsTrain50[,-c(1,4,5,6,7,8,12)]
+
+dummyPredictorsTest50 <- dummy_cols(predictorTesting_all50, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                             'HH_Numb','Health_Insurance'))
+dummyPredictorsTest50 <- dummyPredictorsTest50[,-c(1,4,5,6,7,8,12)]
+
+# 50% AA
+set.seed(0)
+glmnetModel <- train(dummyPredictorsTrain50[,-2],responseTraining_all50,method="glmnet",
+                     trControl = RFparams, preProcess = c('center', 'scale'))
+
+glmnetModel
+glmnetModel$bestTune
+glmnetModel$results[7,] #these are the optimal model params
+glmnetMerge <- merge(glmnetModel$pred,  glmnetModel$bestTune)
+
+#glmnetTest <- data.frame(Method="RF",Y=responseTesting_all5,
+# X=predict(RFmodel,predictorTesting_all5))
+
+#50% GLMnet Predict
+glmnetPredictions <- predict(glmnetModel, newdata=dummyPredictorsTest50[,-2])
+glmnetAssess <- data.frame(obs=responseTesting_all50, pred = glmnetPredictions)
+defaultSummary(glmnetAssess)
+confusionMatrix(glmnetPredictions, reference = responseTesting_all50, positive='Risk')
+
+test <- dummyPredictorsTest50
+test['Race'] <- dummyPredictorsTest50[,2]
+test['predictions'] <- glmnetPredictions
+test['actual_vals'] <- responseTesting_all50
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+## END ##
+
 #GLMNET No Subsample
 dummyPredictorsTrainall <- dummy_cols(pred_train_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                                'HH_Numb','Health_Insurance'))
@@ -559,6 +528,33 @@ test['actual_vals'] <- responseTesting_all20
 test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
 
 table(test$Race, test$Results)
+##End ##
+
+## 50% SVM Model
+set.seed(0)
+svmModel <- train(dummyPredictorsTrain50[,-2],responseTraining_all50,method="svmRadial",
+                  trControl = RFparams, preProcess = c('center', 'scale'), tuneLength = 10)
+
+svmModel
+svmModel$bestTune
+svmModel$results[7,] #these are the optimal model params
+svmMerge <- merge(svmModel$pred,  svmModel$bestTune)
+
+#50% GLMnet Predict
+svmPredictions <- predict(svmModel, newdata=dummyPredictorsTest50[,-2])
+svmAssess <- data.frame(obs=responseTesting_all50, pred = svmPredictions)
+defaultSummary(svmAssess)
+confusionMatrix(svmPredictions, reference = responseTesting_all50, positive='Risk')
+
+test <- dummyPredictorsTest50
+test['Race'] <- dummyPredictorsTest50[,2]
+test['predictions'] <- svmPredictions
+test['actual_vals'] <- responseTesting_all50
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
 
 ## No Subsample SVM Model
 set.seed(0)
