@@ -34,8 +34,6 @@ levels(nhanes_trim$Health_Insurance) <- c('Yes','No')
 
 rm_nas <- na.omit(nhanes_trim)
 
-write.csv(rm_nas, 'C:/Users/prahi/Desktop/DAEN 690 - Capstone/Final Project - GitHub Repo/DAEN-690-Capstone-Project/Data/R_Final_DF.csv', row.names=F)
-
 nhanes_trim <- subset(nhanes_trim, select=-SEQN)
 
 non_AA <- subset(nhanes_trim, Race!='Black')
@@ -118,7 +116,7 @@ RFmodel <- train(predictorTraining_all5,responseTraining_all5,method="rf",
 
 RFmodel
 RFmodel$bestTune
-RFmodel$results[4,] #these are the optimal model params
+RFmodel$results[2,] #these are the optimal model params
 RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
 
 RFTest <- data.frame(Method="RF",Y=responseTesting_all5,
@@ -216,7 +214,7 @@ table(test$Race, test$Results)
 
 # 50%  African American
 set.seed(0)
-index_AA50 <- createDataPartition(response_only_AA, p=0.1, list=FALSE)
+index_AA50 <- createDataPartition(response_only_AA, p=0.5, list=FALSE)
 predictorTraining_only_AA50 <- only_AA[index_AA50,]
 predictorTesting_only_AA50 <- only_AA[-index_AA50,]
 responseTraining_only_AA50 <- response_only_AA[index_AA50]
@@ -259,7 +257,7 @@ RFmodel <- train(predictorTraining_all50,responseTraining_all50,method="rf",
 
 RFmodel
 RFmodel$bestTune
-RFmodel$results[2,] #these are the optimal model params
+RFmodel$results[3,] #these are the optimal model params
 RFmerge <- merge(RFmodel$pred,  RFmodel$bestTune)
 
 RFTest <- data.frame(Method="RF",Y=responseTesting_all50,
@@ -284,8 +282,8 @@ table(test$Race, test$Results)
 
 
 ####model without subsampling AAs#####
-response_all <- rm_nas[,'Measured_Diabetes_x2']
-pred_all <- rm_nas[,-1]
+response_all <- nhanes_trim[,'Measured_Diabetes_x2']
+pred_all <-nhanes_trim[,-1]
 
 set.seed(0)
 index_all <- createDataPartition(response_all, p=0.7, list=FALSE)
@@ -448,11 +446,11 @@ table(test$Race, test$Results)
 dummyPredictorsTrainall <- dummy_cols(pred_train_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                                'HH_Numb','Health_Insurance'))
 
-dummyPredictorsTrainall <- dummyPredictorsTrainall[,-c(1,2,5,6,7,8,9,12)]
+dummyPredictorsTrainall <- dummyPredictorsTrainall[,-c(1,4,5,6,7,8,11)]
 
 dummyPredictorsTestall <- dummy_cols(pred_test_all, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
                                                                              'HH_Numb','Health_Insurance'))
-dummyPredictorsTestall <- dummyPredictorsTestall[,-c(1,2,5,6,7,8,9,12)]
+dummyPredictorsTestall <- dummyPredictorsTestall[,-c(1,4,5,6,7,8,11)]
 
 # No Subsample
 set.seed(0)
