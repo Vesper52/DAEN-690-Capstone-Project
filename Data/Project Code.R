@@ -391,7 +391,7 @@ table(test$Race, test$Results)
 
 ### Syn 70 Data
 
-synData70 <- read.csv('New_Synthetic_Data_70.csv', header = T, sep = ',')
+synData70 <- read.csv('New_Synthetic_Data_90.csv', header = T, sep = ',')
 
 synData70[,names] <- lapply(synData70[,names], as.factor)
 
