@@ -337,3 +337,68 @@ test['actual_vals'] <- resp_test_all
 test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
 
 table(test$Race, test$Results)
+
+### Syn Data
+synData50 <- read.csv('Synthetic_Data_50.csv', header = T, sep = ',')
+
+synData50[,names] <- lapply(synData50[,names], as.factor)
+
+levels(synData50$Gender) <- c('Male','Female')
+levels(synData50$Race) <- c('Mexican','Hispanic','White','Black','Asian','Other')
+levels(synData50$Birth_Country) <- c('USA','Other')
+levels(synData50$Citizenship) <- c('Citizen','Non_Citizen')
+levels(synData50$Edu_Adult) <- c('Below9th','Between9-11','HS_Grad','Some_College','College_Grad')
+levels(synData50$Marital_Status) <- c('Married','Widowed','Divorced','Separated','Never_Married','Living_with_partner')
+levels(synData50$Health_Insurance) <- c('Yes','No')
+
+synResponse50 <- synData70[,'Measured_Diabetes_x2']
+synResponse50 <- factor(synResponse50)
+levels(synResponse50) <- c('No_Risk', 'Risk')
+
+syn_real_response_50 <- c(responseTraining_all30, synResponse50)
+length(responseTraining_all30)
+length(synResponse50)
+length(syn_real_response_50)
+
+syn_real_response_50 <- factor(syn_real_response_50)
+levels(syn_real_response_50) <- c('No_Risk','Risk')
+
+synTrain50 <- synData50[,-13]
+syn_real_train_50 <- rbind(predictorTraining_all30, synTrain50)
+nrow(predictorTraining_all30)
+nrow(synTrain50)
+nrow(syn_real_train_50)
+
+dummyPredictorsTrain30_syn50 <- dummy_cols(predictorTraining_all30, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                               'HH_Numb','Health_Insurance'))
+
+dummyPredictorsTrain30_syn50 <- dummyPredictorsTrain30_syn50[,-c(1,4,5,6,7,8,12)]
+
+dummyPredictorsTest30_syn50 <- dummy_cols(predictorTesting_all30, select_columns=c('Gender', 'Race', 'Birth_Country', 'Citizenship', 'Edu_Adult','Marital_Status',
+                                                                             'HH_Numb','Health_Insurance'))
+dummyPredictorsTest30_syn50 <- dummyPredictorsTest30_syn50[,-c(1,4,5,6,7,8,12)]
+
+# 30% AA
+set.seed(0)
+glmnetModel <- train(dummyPredictorsTrain30_syn50[,-2],responseTraining_all30_syn50,method="glmnet",
+                     trControl = RFparams, preProcess = c('center', 'scale'))
+
+glmnetModel
+glmnetModel$bestTune
+glmnetModel$results[7,] #these are the optimal model params
+glmnetMerge <- merge(glmnetModel$pred,  glmnetModel$bestTune)
+
+#30% GLMnet Predict
+glmnetPredictions <- predict(glmnetModel, newdata=dummyPredictorsTest30[,-2])
+glmnetAssess <- data.frame(obs=responseTesting_all30, pred = glmnetPredictions)
+defaultSummary(glmnetAssess)
+confusionMatrix(glmnetPredictions, reference = responseTesting_all30, positive='Risk')
+
+test <- dummyPredictorsTest30
+test['Race'] <- dummyPredictorsTest30[,2]
+test['predictions'] <- glmnetPredictions
+test['actual_vals'] <- responseTesting_all30
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)

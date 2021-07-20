@@ -329,7 +329,7 @@ table(test_all$Race, test_all$Results)
 
 # Syn 50 Data
 
-synData50 <- read.csv('Synthetic_Data_50.csv', header = T, sep = ',')
+synData50 <- read.csv('New_Synthetic_Data_50.csv', header = T, sep = ',')
 
 synData50[,names] <- lapply(synData50[,names], as.factor)
 
@@ -341,7 +341,7 @@ levels(synData50$Edu_Adult) <- c('Below9th','Between9-11','HS_Grad','Some_Colleg
 levels(synData50$Marital_Status) <- c('Married','Widowed','Divorced','Separated','Never_Married','Living_with_partner')
 levels(synData50$Health_Insurance) <- c('Yes','No')
 
-synResponse50 <- synData70[,'Measured_Diabetes_x2']
+synResponse50 <- synData50[,'Measured_Diabetes_x2']
 synResponse50 <- factor(synResponse50)
 levels(synResponse50) <- c('No_Risk', 'Risk')
 
@@ -391,7 +391,7 @@ table(test$Race, test$Results)
 
 ### Syn 70 Data
 
-synData70 <- read.csv('Synthetic_Data_70.csv', header = T, sep = ',')
+synData70 <- read.csv('New_Synthetic_Data_70.csv', header = T, sep = ',')
 
 synData70[,names] <- lapply(synData70[,names], as.factor)
 
