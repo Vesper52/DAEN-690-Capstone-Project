@@ -586,3 +586,5 @@ test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
 
 table(test$Race, test$Results)
 
+########################################################################################
+###################### Synthetic Data Implementation and Testing #######################
