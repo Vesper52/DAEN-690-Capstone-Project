@@ -326,3 +326,129 @@ table(test_all$Race, test_all$Results)
 
 ########################################################################################
 ###################### Synthetic Data Implementation and Testing #######################
+
+# Syn 50 Data
+
+synData50 <- read.csv('Synthetic_Data_50.csv', header = T, sep = ',')
+
+synData50[,names] <- lapply(synData50[,names], as.factor)
+
+levels(synData50$Gender) <- c('Male','Female')
+levels(synData50$Race) <- c('Mexican','Hispanic','White','Black','Asian','Other')
+levels(synData50$Birth_Country) <- c('USA','Other')
+levels(synData50$Citizenship) <- c('Citizen','Non_Citizen')
+levels(synData50$Edu_Adult) <- c('Below9th','Between9-11','HS_Grad','Some_College','College_Grad')
+levels(synData50$Marital_Status) <- c('Married','Widowed','Divorced','Separated','Never_Married','Living_with_partner')
+levels(synData50$Health_Insurance) <- c('Yes','No')
+
+synResponse50 <- synData70[,'Measured_Diabetes_x2']
+synResponse50 <- factor(synResponse50)
+levels(synResponse50) <- c('No_Risk', 'Risk')
+
+syn_real_response_50 <- c(responseTraining_all30, synResponse50)
+length(responseTraining_all30)
+length(synResponse50)
+length(syn_real_response_50)
+
+syn_real_response_50 <- factor(syn_real_response_50)
+levels(syn_real_response_50) <- c('No_Risk','Risk')
+
+synTrain50 <- synData50[,-13]
+syn_real_train_50 <- rbind(predictorTraining_all30, synTrain50)
+nrow(predictorTraining_all30)
+nrow(synTrain50)
+nrow(syn_real_train_50)
+
+#Model training + testing with 50 Syn Data
+set.seed(0)
+RFmodel_syn <- train(syn_real_train_50,syn_real_response_50,method="rf",
+                 trControl = RFparams,
+                 tuneGrid = RFGrid)
+
+RFmodel_syn
+RFmodel_syn$bestTune
+RFmodel_syn$results[4,] #these are the optimal model params
+RFmerge_syn50 <- merge(RFmodel_syn$pred,  RFmodel_syn$bestTune)
+
+RFTest_syn50 <- data.frame(Method="RF",Y=responseTesting_all30,
+                     X=predict(RFmodel_syn,predictorTesting_all30))
+
+#30%+50 Syn Random Forest Predict
+RFPredictions_syn <- predict(RFmodel_syn, newdata=predictorTesting_all30)
+RFAssess_syn <- data.frame(obs=responseTesting_all30, pred = RFPredictions_syn)
+defaultSummary(RFAssess_syn)
+confusionMatrix(RFPredictions_syn, reference = responseTesting_all30, positive='Risk')
+
+varImp(RFmodel_syn)
+
+test <- predictorTesting_all30
+test['predictions'] <- RFPredictions_syn
+test['actual_vals'] <- responseTesting_all30
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+### Syn 70 Data
+
+synData70 <- read.csv('Synthetic_Data_70.csv', header = T, sep = ',')
+
+synData70[,names] <- lapply(synData70[,names], as.factor)
+
+levels(synData70$Gender) <- c('Male','Female')
+levels(synData70$Race) <- c('Mexican','Hispanic','White','Black','Asian','Other')
+levels(synData70$Birth_Country) <- c('USA','Other')
+levels(synData70$Citizenship) <- c('Citizen','Non_Citizen')
+levels(synData70$Edu_Adult) <- c('Below9th','Between9-11','HS_Grad','Some_College','College_Grad')
+levels(synData70$Marital_Status) <- c('Married','Widowed','Divorced','Separated','Never_Married','Living_with_partner')
+levels(synData70$Health_Insurance) <- c('Yes','No')
+
+synResponse70 <- synData70[,'Measured_Diabetes_x2']
+synResponse70 <- factor(synResponse70)
+levels(synResponse70) <- c('No_Risk', 'Risk')
+
+syn_real_response_70 <- c(responseTraining_all30, synResponse70)
+length(responseTraining_all30)
+length(synResponse70)
+length(syn_real_response_70)
+
+syn_real_response_70 <- factor(syn_real_response_70)
+levels(syn_real_response_70) <- c('No_Risk','Risk')
+
+synTrain70 <- synData70[,-13]
+syn_real_train_70 <- rbind(predictorTraining_all30, synTrain70)
+nrow(predictorTraining_all30)
+nrow(synTrain70)
+nrow(syn_real_train_70)
+
+#Model training + testing with 50 Syn Data
+set.seed(0)
+RFmodel_syn <- train(syn_real_train_70,syn_real_response_70,method="rf",
+                     trControl = RFparams,
+                     tuneGrid = RFGrid)
+
+RFmodel_syn
+RFmodel_syn$bestTune
+RFmodel_syn$results[4,] #these are the optimal model params
+RFmerge_syn70 <- merge(RFmodel_syn$pred,  RFmodel_syn$bestTune)
+
+RFTest_syn70 <- data.frame(Method="RF",Y=responseTesting_all30,
+                           X=predict(RFmodel_syn,predictorTesting_all30))
+
+#30%+70 Syn Random Forest Predict
+RFPredictions_syn <- predict(RFmodel_syn, newdata=predictorTesting_all30)
+RFAssess_syn <- data.frame(obs=responseTesting_all30, pred = RFPredictions_syn)
+defaultSummary(RFAssess_syn)
+confusionMatrix(RFPredictions_syn, reference = responseTesting_all30, positive='Risk')
+
+varImp(RFmodel_syn)
+
+test <- predictorTesting_all30
+test['predictions'] <- RFPredictions_syn
+test['actual_vals'] <- responseTesting_all30
+
+test <- test %>% mutate(Results = if_else(predictions ==actual_vals, 1, 0))
+
+table(test$Race, test$Results)
+
+
