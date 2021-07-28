@@ -239,7 +239,28 @@ svmMerge <- merge(svmModel$pred,  svmModel$bestTune)
 svmPredictions <- predict(svmModel, newdata=dummyPredictorsTest5[,-2])
 svmAssess <- data.frame(obs=responseTesting_all5, pred = svmPredictions)
 defaultSummary(svmAssess)
-confusionMatrix(svmPredictions, reference = responseTesting_all5, positive='Risk')
+CM <- confusionMatrix(svmPredictions, reference = responseTesting_all5, positive='Risk')
+
+#Confusion Matrix Visualization for 5% Black SVM
+
+table <- data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Accuracy = ifelse(table$Prediction == table$Reference, "TP/TN", "FP/FN")) %>%
+  group_by(Reference) %>%
+  mutate(Percentage = Freq/sum(Freq))
+library(scales)
+# fill alpha relative to sensitivity/specificity by proportional outcomes within reference groups (see dplyr code above as well as original confusion matrix for comparison)
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Accuracy, alpha = Percentage)) +  geom_tile() +
+  ggtitle("Confusion Matrix for 5% Black SVM Model") +
+  geom_text(aes(label = comma(Freq)), vjust = .5, fontface  = "bold", alpha = 1) +
+  scale_fill_manual(values = c("TP/TN" = "#3CB371", "FP/FN" = "#FA8072")) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +  
+  xlim(rev(levels(table$Reference)))
+
+
+
 
 test <- dummyPredictorsTest5
 test['Race'] <- dummyPredictorsTest5[,2]
@@ -318,7 +339,26 @@ svmMerge <- merge(svmModel$pred,  svmModel$bestTune)
 svmPredictions <- predict(svmModel, newdata=dummyPredictorsTestall[,-2])
 svmAssess <- data.frame(obs=resp_test_all, pred = svmPredictions)
 defaultSummary(svmAssess)
-confusionMatrix(svmPredictions, reference = resp_test_all, positive='Risk')
+CM <- confusionMatrix(svmPredictions, reference = resp_test_all, positive='Risk')
+
+#Confusion Matrix Visualization for No Sub sample SVM Models
+
+table <- data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Accuracy = ifelse(table$Prediction == table$Reference, "TP/TN", "FP/FN")) %>%
+  group_by(Reference) %>%
+  mutate(Percentage = Freq/sum(Freq))
+library(scales)
+# fill alpha relative to sensitivity/specificity by proportional outcomes within reference groups (see dplyr code above as well as original confusion matrix for comparison)
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Accuracy, alpha = Percentage)) +  geom_tile() +
+  ggtitle("Confusion Matrix for No Sub Sample SVM Model") +
+  geom_text(aes(label = comma(Freq)), vjust = .5, fontface  = "bold", alpha = 1) +
+  scale_fill_manual(values = c("TP/TN" = "#3CB371", "FP/FN" = "#FA8072")) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +  
+  xlim(rev(levels(table$Reference)))
+
 
 test <- dummyPredictorsTestall
 test['Race'] <- dummyPredictorsTestall[,2]
